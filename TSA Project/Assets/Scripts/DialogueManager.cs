@@ -54,6 +54,7 @@ public class DialogueManager : MonoBehaviour
     // private CurrencyManager currencyScript;
 
     private DialogueVariables dialogueVariables;
+    private EventsManager eventsManager;
 
     // private CloudSaveScript saveScript;
 
@@ -63,6 +64,7 @@ public class DialogueManager : MonoBehaviour
     void Start()
     {
         textBox = dialogueTextBox.transform.Find("Dialogue").gameObject.GetComponent<TextMeshProUGUI>();
+        eventsManager = GameObject.Find("GameManager").GetComponent<EventsManager>();
         // currencyScript = GameObject.Find("GameManager").GetComponent<CurrencyManager>();
         // saveScript = GameObject.Find("GameManager").GetComponent<CloudSaveScript>();
         // puzzleManager = GameObject.Find("PuzzleManager").GetComponent<PuzzleManager>();
@@ -121,7 +123,7 @@ public class DialogueManager : MonoBehaviour
 
     //Updates the text in the text box
     public void UpdateDialogueBox(){
-        
+        DecisionTags(currentStory.currentTags);
         //If there is a dialogue coroutine still running, stop/delete it
         if (displayDialogueCoroutine != null){
             StopCoroutine(displayDialogueCoroutine);
@@ -144,8 +146,20 @@ public class DialogueManager : MonoBehaviour
         dialogueTextBox.SetActive(isInteracting);
         interactButton.SetActive(!isInteracting);
         UpdateDialogueBox();
-        Movement_2D.SetCanMove(false);
-        
+        Movement_2D.SetCanMove(false);   
+    }
+
+    public void ActivateDialogueEvent(int index){
+        Debug.Log(index);
+        if (index == -1){
+            TextAsset storyTxt = eventsManager.triggerRandomEvent();
+            currentStory =  new Story(storyTxt.text);
+            Debug.Log(storyTxt);
+        }
+        else{
+            currentStory =  new Story(eventsManager.triggerSelectedEvent(index).text);
+        }
+        ActivateDialogue();
     }
 
     //Deactivates the dialogue textbox
@@ -258,7 +272,7 @@ public class DialogueManager : MonoBehaviour
         currentStory.ChooseChoiceIndex(choiceIndex); //Updates the story to continue accordingly
         currentStory.Continue();//Skip the dialogue of the player's choice
         //Processes the player's decision using Tags
-        DecisionTags(currentStory.currentTags);
+        
         
 
         //This hides all the choice buttons following the player's decision
@@ -284,6 +298,16 @@ public class DialogueManager : MonoBehaviour
                 switch(tagKey){
                     case "Test":
                         Debug.Log("Test Tag Triggered!");
+                        break;
+                    case "RerollEvent":
+                        if (tagValue == "true"){
+                            eventsManager.incrementRandomEventCounter();
+                            DeactivateDialogue();
+                            // ActivateDialogueEvent(-1);
+                        }
+                        else{
+                            eventsManager.setRandomEventCounter(0);
+                        }
                         break;
                     //Past Example of Tag Usage
                     // case "Reputation":

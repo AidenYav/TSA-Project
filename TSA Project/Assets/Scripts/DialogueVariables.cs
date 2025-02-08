@@ -88,7 +88,7 @@ public class DialogueVariables
         //For each key-value pair in the dictionary, sync it into the Ink file
         foreach(KeyValuePair<string, Ink.Runtime.Object> variable in variables){
             story.variablesState.SetGlobal(variable.Key, variable.Value);
-            Debug.Log(variable.Key + " = " + variable.Value.ToString());
+            // Debug.Log(variable.Key + " = " + variable.Value.ToString());
         }
     }
 }
