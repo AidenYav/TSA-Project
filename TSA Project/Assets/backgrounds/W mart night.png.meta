@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      W mart night_0: 2805480877525930108
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

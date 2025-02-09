@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      makung food_0: -4323106287906024867
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

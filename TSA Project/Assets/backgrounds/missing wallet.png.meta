@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      missing wallet_0: -2066043996455266317
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

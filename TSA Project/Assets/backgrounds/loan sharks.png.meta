@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      loan sharks_0: -4725132055232953976
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

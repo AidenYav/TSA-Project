@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      fish market tossing_0: 3965048521413182083
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -32,6 +32,9 @@ VAR Carina_EXP = 0
 VAR Orion_EXP = 0
 VAR Izar_EXP = 0
 
+//Minigame Sucess
+VAR game = 1
+
 
 === Random_Event_Failed ===
    //#RerollEvent:true

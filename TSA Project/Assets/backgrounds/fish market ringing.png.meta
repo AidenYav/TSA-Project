@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      fish market ringing_0: 5926493446394665836
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
