@@ -8,13 +8,13 @@ public class Relationship : MonoBehaviour
     private string character;
     private int relationshipValue;
     private int maxRelationship = 100;
-    private <Dictionary<string, bool> events;
+    private <Dictionary<string, bool, bool> events;
 
     public Relationship(string character)
     {
         this.character = character;
         this.relationshipValue = 0;
-        this.events =  new Dictionary<string, bool>;
+        this.events =  new Dictionary<string, bool, bool>;
     }
 
     //the relationship value is made sure to be between 0 and 100
@@ -38,10 +38,10 @@ public class Relationship : MonoBehaviour
         AddRelationship(increase);
     }
 
-    public void AddEvent(string newEvent, boolean hasToHappen)
+    public void AddEvent(string newEvent, bool hasToHappen, bool isGood)
     {
         //this adds an item to the end of a queue
-        events.Add(newEvent, hasToHappen);
+        events.Add(newEvent, hasToHappen, isGood);
     }
 
     public Dictionary<string, bool> GetNextEvent()
