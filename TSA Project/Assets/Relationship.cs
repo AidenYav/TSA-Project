@@ -8,13 +8,13 @@ public class Relationship : MonoBehaviour
     private string character;
     private int relationshipValue;
     private int maxRelationship = 100;
-    private Queue<string> eventQueue;
+    private <Dictionary<string, bool> events;
 
     public Relationship(string character)
     {
         this.character = character;
         this.relationshipValue = 0;
-        this.eventQueue = new Queue<string>();
+        this.events =  new Dictionary<string, bool>;
     }
 
     //the relationship value is made sure to be between 0 and 100
@@ -30,7 +30,7 @@ public class Relationship : MonoBehaviour
         Console.WriteLine($"{character} and you are now closer! Relationship: {relationshipValue}");
         CheckForUnlocks();
     }
-    
+
     //assuming you hang out, your relationship increases
     public void HangOut()
     {
@@ -38,24 +38,25 @@ public class Relationship : MonoBehaviour
         AddRelationship(increase);
     }
 
-    public void AddEvent(string newEvent)
+    public void AddEvent(string newEvent, boolean hasToHappen)
     {
         //this adds an item to the end of a queue
-        eventQueue.Enqueue(newEvent);
+        events.Add(newEvent, hasToHappen);
     }
 
-    public string GetNextEvent()
+    public Dictionary<string, bool> GetNextEvent()
     {
-        //if an event exist in the queue then 
-        //remove it and returns the first element of a queue
-        if eventQueue.Count > 0:
-            eventQueue.Dequeue();
+        if (events.Count > 0)
+        {
+            //Dequeue takes the first element and then removes it
+            var nextEvent = events.Dequeue();
+            return nextEvent;
+        }
         return null;
-    }
-    
+    } 
     public bool HasNextEvent()
     {
-        return eventQueue.Count > 0;
+        return events.Count > 0;
     }
 
     private int GetRelationshipIncrease()
