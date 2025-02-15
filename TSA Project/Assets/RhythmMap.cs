@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
+
 public class RhythmEvent
 {
     // Time in seconds when a note should be hit
