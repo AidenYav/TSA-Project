@@ -35,7 +35,12 @@ public class DialogueManager : MonoBehaviour
     //If the player is currently in a dialogue (We could use this to stop movement when talking if we wished)
     private bool isInteracting;
 
-
+    /*
+    //Audio source and sound effects when typing dialogue
+    private AudioSource source;
+    public AudioClip[] voiceClipArray;
+    */
+    
     //------------------Variables for Typing effect------------------
     private float typingSpeed = 0.04f; //Seconds per each character "typed" in dialogue
 
@@ -55,6 +60,7 @@ public class DialogueManager : MonoBehaviour
 
     private DialogueVariables dialogueVariables;
     private EventsManager eventsManager;
+    private ExpressionAnimationManager expressionManager;
 
     // private CloudSaveScript saveScript;
 
@@ -65,6 +71,8 @@ public class DialogueManager : MonoBehaviour
     {
         textBox = dialogueTextBox.transform.Find("Dialogue").gameObject.GetComponent<TextMeshProUGUI>();
         eventsManager = GameObject.Find("GameManager").GetComponent<EventsManager>();
+        expressionManager = GameObject.Find("GameManager").GetComponent<ExpressionAnimationManager>();
+        // source = gameObject.GetComponent<AudioSource>();
         // currencyScript = GameObject.Find("GameManager").GetComponent<CurrencyManager>();
         // saveScript = GameObject.Find("GameManager").GetComponent<CloudSaveScript>();
         // puzzleManager = GameObject.Find("PuzzleManager").GetComponent<PuzzleManager>();
@@ -222,6 +230,7 @@ public class DialogueManager : MonoBehaviour
             }
             else{
                 textBox.text += letter;
+                //playSound(voiceClipArray)
                 yield return new WaitForSeconds(typingSpeed);
             }
         }
@@ -303,25 +312,21 @@ public class DialogueManager : MonoBehaviour
                         if (tagValue == "true"){
                             eventsManager.incrementRandomEventCounter();
                             DeactivateDialogue();
-                            // ActivateDialogueEvent(-1);
+                            ActivateDialogueEvent(-1);
                         }
                         else{
                             eventsManager.setRandomEventCounter(0);
                         }
                         break;
-                    //Past Example of Tag Usage
-                    // case "Reputation":
-                    //     int rep = int.Parse(tagValue);
-                    //     currencyScript.ChangeReputation(rep);
-                    //     break;
-                    // case "Level":
-                    //     int level = int.Parse(tagValue) - 1; //Since there is no level 0, offset by 1
-                    //     puzzleManager.SetPuzzle(level); 
-                    //     break;
-                    // case "Money":
-                    //     int money = int.Parse(tagValue);
-                    //     currencyScript.ChangeMoney(money);
-                    //     break;
+                    //Animation Tags:
+                    case "OrionAnimate":
+                        // Debug.Log("Animating Orion " + tag);
+                        expressionManager.playExpression(tagValue);
+                        break;
+                    case "CarinaAnimate":
+                        // Debug.Log("Animating Carina " + tag);
+                        expressionManager.playExpression(tagValue);
+                        break;
                     default:
                         Debug.Log("Error, tag [" + tagKey + "] could not be identified.");
                         break;
@@ -336,5 +341,12 @@ public class DialogueManager : MonoBehaviour
         return canInteract;
     }
 
+    /*
+    //Plays a sound from the selected voice clips
+    public void playSound(AudioClip[] clips){
+        int num = random.Next(clips.Length); 
+        source.PlayOneShot (source.clip[num]);
+    }
+    */
 
 }

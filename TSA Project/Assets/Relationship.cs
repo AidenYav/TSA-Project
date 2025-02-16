@@ -1,97 +1,81 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-//*IMPORANT*
-//I am going to assume that you will replace the Console.WriteLine with some gui
-//if you don't like some methods or want to change them, you can
-//There is a relationship feature in the Player Class, you many want to figure out how to how to integerate them
+//there were a bunch of changes compared to the last push
+//I expect all the Console.WriteLine() to be replaced with some GUI or you could just remove them
 public class Relationship : MonoBehaviour
 {
-    private Dictionary<string, int> relationshipStats;
-    private List<string> knownCharacters;
+    private string character;
+    private int relationshipValue;
     private int maxRelationship = 100;
+    private Dictionary<string, bool> events;
 
-    public Relationship()
+    public Relationship(string character)
     {
-        relationshipStats = new Dictionary<string, int>();
-        knownCharacters = new List<string>();
-
-        foreach (var character in Player.characters)
-        {
-            string characterName = character.Key;
-            relationshipStats[characterName] = 0;
-            knownCharacters.Add(characterName);
-        }
-    }
-    public void SetRelationship(string character, int value)
-    {
-            //Clamp is a method that only adds the number if it is from 0<=x<=100
-            relationshipStats[character] = Mathf.Clamp(value, 0, maxRelationship);
+        this.character = character;
+        this.relationshipValue = 0;
+        this.events =  new Dictionary<string, bool>();
     }
 
-    public void AddRelationship(string character, int value)
+    //the relationship value is made sure to be between 0 and 100
+    public void SetRelationship(int value)
     {
-        if(relationshipStats.ContainsKey(character))
-        {
-            relationshipStats[character] += increase;
-            //If relationshopStats > 100, then set relationship value to 100
-            relationshipStats[character] = Mathf.Min(relationshipStats[character], maxRelationship);
-            Console.WriteLine($"{character} and you are now closer! Relationship: {relationshipStats[character]}");
-            CheckForUnlocks(character);
-        } else
-        {
-            Console.WriteLine("You haven't meet this character yet.");
-        }
-    }
-    public void HangOut(string character)
-    {
-        if (relationshipStats.ContainsKey(character))
-        {
-            int increase = GetRelationshipIncrease(character);
-             AddRelationship(character, increase);
-        }
-        else
-        {
-            Console.WriteLine("You haven't met this character yet.");
-        }
+        relationshipValue = Mathf.Clamp(value, 0, maxRelationship);
     }
 
-    public void MeetNewCharacter(string newCharacter)
+    //adds to the relationship value as long as it does not surpas the max value
+    public void AddRelationship(int value)
     {
-        if (!relationshipStats.ContainsKey(newCharacter))
-        {
-            relationshipStats[newCharacter] = 0;
-            knownCharacters.Add(newCharacter);
-            Console.WriteLine($"You met {newCharacter}! You can now interact with them.");
-        }
-        else
-        {
-            Console.WriteLine($"You already know {newCharacter}.");
-        }
+        relationshipValue = Mathf.Min(relationshipValue + value, maxRelationship);
+        Console.WriteLine($"{character} and you are now closer! Relationship: {relationshipValue}");
+        CheckForUnlocks();
     }
 
-    public void SkipInteraction()
+    //assuming you hang out, your relationship increases
+    public void HangOut()
     {
-        Console.WriteLine("You decided to do your own thing today.");
+        int increase = GetRelationshipIncrease();
+        AddRelationship(increase);
     }
 
-    private int GetRelationshipIncrease(string character)
+    public void AddEvent(string newEvent, bool hasToHappen, bool isGood)
     {
-        //you can change the numbers or even get rid of this method 
-        if (character == "BestFriend")
+        //this adds an item to the end of a queue
+        events.Add(newEvent, hasToHappen, isGood);
+    }
+
+    public Dictionary<string, bool> GetNextEvent()
+    {
+        if (events.Count > 0)
+        {
+            //Dequeue takes the first element and then removes it
+            var nextEvent = events.Dequeue();
+            return nextEvent;
+        }
+        return null;
+    } 
+    public bool HasNextEvent()
+    {
+        return events.Count > 0;
+    }
+
+    private int GetRelationshipIncrease()
+    {
+        if(character == "BestFriend"){
             return 5;
-        else
-            return 3;
+        }
+        else{
+            return 3; 
+        }
     }
 
-    private void CheckForUnlocks(string character)
+    private void CheckForUnlocks()
     {
-        //you can manupliate the numbers or add more unlocked events
-        if (relationshipStats[character] >= 50)
+        if (relationshipValue >= 50)
         {
             Console.WriteLine($"{character} is starting to trust you more. New events may be available.");
         }
-        if (relationshipStats[character] >= 75)
+        if (relationshipValue >= 75)
         {
             Console.WriteLine($"{character} and you are now very close! Special events unlocked.");
         }
