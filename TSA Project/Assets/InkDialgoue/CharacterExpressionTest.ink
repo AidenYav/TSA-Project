@@ -1,3 +1,4 @@
+#Background:basketball
 #OrionAnimate:Orion_Talking #CarinaAnimate:Carina_Talking
 Test Dialogue
 [Your pal Orion appears before you]

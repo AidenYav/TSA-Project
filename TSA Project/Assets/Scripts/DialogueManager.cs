@@ -73,9 +73,6 @@ public class DialogueManager : MonoBehaviour
         eventsManager = GameObject.Find("GameManager").GetComponent<EventsManager>();
         expressionManager = GameObject.Find("GameManager").GetComponent<ExpressionAnimationManager>();
         // source = gameObject.GetComponent<AudioSource>();
-        // currencyScript = GameObject.Find("GameManager").GetComponent<CurrencyManager>();
-        // saveScript = GameObject.Find("GameManager").GetComponent<CloudSaveScript>();
-        // puzzleManager = GameObject.Find("PuzzleManager").GetComponent<PuzzleManager>();
         //Initializes the variables used for the choice set-up
         choicesText = new TextMeshProUGUI[choices.Length];
         int index = 0;
@@ -327,6 +324,9 @@ public class DialogueManager : MonoBehaviour
                         // Debug.Log("Animating Carina " + tag);
                         expressionManager.playExpression(tagValue);
                         break;
+                    case "Background":
+                        expressionManager.playBackground(tagValue);
+                    break;
                     default:
                         Debug.Log("Error, tag [" + tagKey + "] could not be identified.");
                         break;
