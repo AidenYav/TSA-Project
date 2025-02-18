@@ -12,6 +12,6 @@ INCLUDE ../GlobalVariables.ink
 {condition: -> Tripping_Falling | -> Random_Event_Failed}
 
 === Tripping_Falling ===
-    <i>Ouch!! I fell on my face… That was embarrassing!<i>
+    <i>Ouch!! You fell on your face… That was embarrassing!<i>
     ~ Player_SelfEsteem -= fallingValue 
 -> END

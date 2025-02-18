@@ -1,1 +1,1 @@
-I haven’t seen this friend in forever! Time to catch up!
+You haven’t seen this friend in forever! Time to catch up!

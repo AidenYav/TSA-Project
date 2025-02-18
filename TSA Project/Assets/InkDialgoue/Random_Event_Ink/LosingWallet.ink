@@ -1,5 +1,5 @@
-I reach into my pocket and feel for my wallet
+You reach into your pocket and feel for your wallet
 Wait a second! Where did it go?
-I must have lost it...
-Ugh now I have to cancel all my cards
+You must have lost it...
+Ugh now you have to cancel all my cards
 //-$30

@@ -35,6 +35,9 @@ VAR Izar_EXP = 0
 //Minigame Sucess
 VAR game = 1
 
+//Character Storyline
+VAR OrionEvent=1
+VAR SolEvent=1
 
 === Random_Event_Failed ===
    //#RerollEvent:true
