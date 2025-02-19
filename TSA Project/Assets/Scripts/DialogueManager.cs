@@ -20,11 +20,11 @@ public class DialogueManager : MonoBehaviour
     private TextMeshProUGUI[] choicesText; //This will work with the choices List, this is for convinence and readability
 
     private TextMeshProUGUI textBox; //Will be used as an alias since pathing to the textbox from the parent game object is unreadable
-    
-    
+
+
     //-----------------Variables for Interacting with NPCs ------------------
     //This will store the npc currently being interacted with
-    
+
     // [SerializeField] private TextAsset globalsInkFile;
     [SerializeField] private TextAsset globalsJson;
     private Story currentStory;
@@ -35,12 +35,6 @@ public class DialogueManager : MonoBehaviour
     //If the player is currently in a dialogue (We could use this to stop movement when talking if we wished)
     private bool isInteracting;
 
-    /*
-    //Audio source and sound effects when typing dialogue
-    private AudioSource source;
-    public AudioClip[] voiceClipArray;
-    */
-    
     //------------------Variables for Typing effect------------------
     private float typingSpeed = 0.04f; //Seconds per each character "typed" in dialogue
 
@@ -49,10 +43,27 @@ public class DialogueManager : MonoBehaviour
 
     //Boolean to control the player from skipping dialogue
     private bool canContinueDialogue = true;
-    
+
     private bool isAddingRichTextTag = false;
 
     private bool skipLine = false;
+
+
+    //Audio source and sound effects when typing dialogue
+    [Header("Audio")]
+
+    [SerializeField] private AudioClip dialogueTypingSoundClip;
+
+    [SerializeField] private float minPitch = 0.5f;
+    [Range(-3,3)]
+
+    [SerializeField] private float maxPitch = 3f;
+
+    [SerializeField] private bool stopAudioSource;
+
+    private AudioSource audioSource;
+    //public AudioClip[] voiceClipArray;
+
 
     //--------------------Other Scripts-----------------------------
 
@@ -72,11 +83,15 @@ public class DialogueManager : MonoBehaviour
         textBox = dialogueTextBox.transform.Find("Dialogue").gameObject.GetComponent<TextMeshProUGUI>();
         eventsManager = GameObject.Find("GameManager").GetComponent<EventsManager>();
         expressionManager = GameObject.Find("GameManager").GetComponent<ExpressionAnimationManager>();
-        // source = gameObject.GetComponent<AudioSource>();
+        audioSource = gameObject.GetComponent<AudioSource>();
+        // currencyScript = GameObject.Find("GameManager").GetComponent<CurrencyManager>();
+        // saveScript = GameObject.Find("GameManager").GetComponent<CloudSaveScript>();
+        // puzzleManager = GameObject.Find("PuzzleManager").GetComponent<PuzzleManager>();
         //Initializes the variables used for the choice set-up
         choicesText = new TextMeshProUGUI[choices.Length];
         int index = 0;
-        foreach(GameObject choice in choices){
+        foreach (GameObject choice in choices)
+        {
             choicesText[index] = choice.GetComponentInChildren<TextMeshProUGUI>();
             choice.SetActive(false);
             index++;
@@ -85,7 +100,7 @@ public class DialogueManager : MonoBehaviour
         // StartCoroutine(ResyncDialogueVariables());
     }
 
-    
+
     // public IEnumerator ResyncDialogueVariables(){
     //     // yield return new WaitUntil(() => saveScript.GetDataLoaded());
     //     dialogueVariables = new DialogueVariables(globalsJson);
@@ -99,76 +114,87 @@ public class DialogueManager : MonoBehaviour
          *  canContinueDialogue = true                  --- This means the player can continue to the next portion of the dialogue
          *  isInteracting = true                        --- This means the player is currently interacting with the NPC
          *  E OR Mouse Left Click is pressed            --- This means the player wants to proceed with the dialogue by interacting with their mouse or keyboard*/
-        if (canContinueDialogue && 
-            isInteracting && 
-            ( Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0) ) 
-            ) {
+        if (canContinueDialogue &&
+            isInteracting &&
+            (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
+            )
+        {
             UpdateDialogueBox(); //While user is interacting, update text box
         }
         /*Intentionally placed as an else-if so this would trigger last
          *This avoids skipping the first line of the dialogue from double UpdateDialogueBox() calls
          *This setup also makes the Interact UI compatible as a button for clicking 
          * canInteract = true                           --- Player is currently NOT interacting with the NPC, however, they have the ability to do so*/
-        else if (canContinueDialogue && canInteract && Input.GetKeyDown(KeyCode.E)){
+        else if (canContinueDialogue && canInteract && Input.GetKeyDown(KeyCode.E))
+        {
             ActivateDialogue();
         }
         /* Allows the user to skip the dialogue if the following conditions are met:
          *  canContinueDialogue = false                 --- This implies that the dialogue animation is currently running
          *  E or Left click is triggered                --- This means the player wants to skip the dialogue
          *  textBox's text length is greater than 10    --- The text animation has displayed at least 10 characters */
-        else if (!canContinueDialogue 
+        else if (!canContinueDialogue
                 && (Input.GetKeyDown(KeyCode.E) || Input.GetMouseButtonDown(0))
                 && textBox.text.Length > 10)
-                {
+        {
             skipLine = true;
         }
-        
+
 
     }
 
     //Updates the text in the text box
-    public void UpdateDialogueBox(){
+    public void UpdateDialogueBox()
+    {
         DecisionTags(currentStory.currentTags);
         //If there is a dialogue coroutine still running, stop/delete it
-        if (displayDialogueCoroutine != null){
+        if (displayDialogueCoroutine != null)
+        {
             StopCoroutine(displayDialogueCoroutine);
         }
         //Creates a new coroutine to begin the typing effect
-        if (currentStory.canContinue){ //Checks if the story has more text or not
+        if (currentStory.canContinue)
+        { //Checks if the story has more text or not
             displayDialogueCoroutine = DisplayLine(currentStory.Continue());
             StartCoroutine(displayDialogueCoroutine);
         }
-        else{
+        else
+        {
             DeactivateDialogue();
         }
 
     }
 
     //Initiates Dialogue with NPC
-    public void ActivateDialogue(){
+    public void ActivateDialogue()
+    {
         dialogueVariables.StartListening(currentStory);
         isInteracting = true;
         dialogueTextBox.SetActive(isInteracting);
         interactButton.SetActive(!isInteracting);
         UpdateDialogueBox();
-        Movement_2D.SetCanMove(false);   
+        Movement_2D.SetCanMove(false);
     }
 
-    public void ActivateDialogueEvent(int index){
+    public void ActivateDialogueEvent(int index)
+    {
         Debug.Log(index);
-        if (index == -1){
+        if (index == -1)
+        {
             TextAsset storyTxt = eventsManager.triggerRandomEvent();
-            currentStory =  new Story(storyTxt.text);
+            currentStory = new Story(storyTxt.text);
             Debug.Log(storyTxt);
         }
-        else{
-            currentStory =  new Story(eventsManager.triggerSelectedEvent(index).text);
+        else
+        {
+            currentStory = new Story(eventsManager.triggerSelectedEvent(index).text);
         }
         ActivateDialogue();
     }
 
     //Deactivates the dialogue textbox
-    public void DeactivateDialogue(){
+    public void DeactivateDialogue()
+    {
         dialogueVariables.StopListening(currentStory);
         isInteracting = false;
         textBox.text = "";
@@ -179,17 +205,19 @@ public class DialogueManager : MonoBehaviour
 
     //Shows interact button and prepare dialogue interaction
     //Takes in the GameObject npc to souce dialogue information
-    public void Interactable(TextAsset inkJson){
+    public void Interactable(TextAsset inkJson)
+    {
         currentStory = new Story(inkJson.text);
         canInteract = true;
         canContinueDialogue = canInteract;
         interactButton.transform.Find("NPC-Interact").GetComponent<TextMeshProUGUI>().text = "E - Interact";
         interactButton.SetActive(canInteract);
-        
+
     }
 
     //Sets all dialogue-related text to false defaults
-    public void NotInteractable(){
+    public void NotInteractable()
+    {
         currentStory = null;
         canInteract = false;
         isInteracting = canInteract;
@@ -197,37 +225,46 @@ public class DialogueManager : MonoBehaviour
         dialogueTextBox.SetActive(canInteract);
     }
 
-    private IEnumerator DisplayLine(string line){
+    private IEnumerator DisplayLine(string line)
+    {
         //Clear out any choice buttons that may still be active
         hideChoices(0);
         //clear out any dialogue
         textBox.text = "";
         //Boolean to control the player from skipping dialogue
         canContinueDialogue = false;
+        //Integer to show the number of characters in a line
+        textBox.maxVisibleCharacters = 0;
         //Uses a for loop to type each individual character into the dialogue box
         //To create the "typing" effect
-        foreach(char letter in line.ToCharArray()){
+        foreach (char letter in line.ToCharArray())
+        {
 
             //To skip parts of dialogue
             //skipLine can be toggled true by the Update function
-            if (skipLine){
+            if (skipLine)
+            {
                 textBox.text = line;
                 skipLine = false;
                 break;
             }
             //Implementation for RichText if we decide to use it
             //Looks for the opening tag of a RichTextTag
-            if (letter == '<' || isAddingRichTextTag){
+            if (letter == '<' || isAddingRichTextTag)
+            {
                 isAddingRichTextTag = true;
                 textBox.text += letter;
                 //Looks for the closing tag of a RichTextTag
-                if (letter == '>'){
+                if (letter == '>')
+                {
                     isAddingRichTextTag = false;
                 }
             }
-            else{
+            else
+            {
                 textBox.text += letter;
-                //playSound(voiceClipArray)
+                playDialogueSound(textBox.maxVisibleCharacters);
+                textBox.maxVisibleCharacters++;
                 yield return new WaitForSeconds(typingSpeed);
             }
         }
@@ -238,22 +275,27 @@ public class DialogueManager : MonoBehaviour
     }
 
     //Displays up to 3 available choices
-    private void DisplayChoices(){
+    private void DisplayChoices()
+    {
         List<Choice> currentChoices = currentStory.currentChoices;
         //If the player can make a choice, they must interact with the choice buttons
-        if (currentChoices.Count != 0){
+        if (currentChoices.Count != 0)
+        {
             canContinueDialogue = false;
         }
 
         //Makes sure there aren't too many choices that the UI cannot handle.
-        if (currentChoices.Count > choices.Length){
-            Debug.LogError("Too many choices were provided." + currentChoices.Count +" was provided, UI can only handle " + choices.Length);
+        if (currentChoices.Count > choices.Length)
+        {
+            Debug.LogError("Too many choices were provided." + currentChoices.Count + " was provided, UI can only handle " + choices.Length);
         }
         //Just in case there are too many choices.
-        else {
+        else
+        {
             int index = 0;
             //For each choice provided, enable and initialize the text choices
-            foreach(Choice choice in currentChoices){
+            foreach (Choice choice in currentChoices)
+            {
                 choices[index].gameObject.SetActive(true);
                 choicesText[index].text = choice.text;
                 index++;
@@ -264,9 +306,11 @@ public class DialogueManager : MonoBehaviour
     }
 
     //Hides all choice buttons ranging from [idx,choices.Length)
-    private void hideChoices(int idx){
+    private void hideChoices(int idx)
+    {
         //This hides all the choice buttons following the player's decision
-        for (int i=idx; i<choices.Length; i++){
+        for (int i = idx; i < choices.Length; i++)
+        {
             choices[i].gameObject.SetActive(false);
         }
     }
@@ -274,12 +318,13 @@ public class DialogueManager : MonoBehaviour
     //This is for the choice buttons to record what the player picks.
     //The choiceIndex is hard-coded into the button, and should correspond
     //to the corresponding text choice and name. Ex: Choice0 --> 0
-    public void MakeChoice(int choiceIndex){
+    public void MakeChoice(int choiceIndex)
+    {
         currentStory.ChooseChoiceIndex(choiceIndex); //Updates the story to continue accordingly
         currentStory.Continue();//Skip the dialogue of the player's choice
-        //Processes the player's decision using Tags
-        
-        
+                                //Processes the player's decision using Tags
+
+
 
         //This hides all the choice buttons following the player's decision
         hideChoices(0);
@@ -288,30 +333,37 @@ public class DialogueManager : MonoBehaviour
         UpdateDialogueBox(); //Following the player's response, immediately continue the dialogue
     }
 
-    public void DecisionTags(List<string> currentTags){
-        foreach(string tag in currentTags){
+    public void DecisionTags(List<string> currentTags)
+    {
+        foreach (string tag in currentTags)
+        {
             //Split the tag
             string[] splitTag = tag.Split(':');
             //Ensures that the tag is approprietly parsed
-            if (splitTag.Length != 2){
+            if (splitTag.Length != 2)
+            {
                 Debug.Log("Error with tag, could not parse: " + tag);
             }
-            else{
+            else
+            {
                 string tagKey = splitTag[0].Trim();
                 string tagValue = splitTag[1].Trim();
                 Debug.Log(tagValue);
                 //Currently only 1 tag, but this is set up for more tags in the future
-                switch(tagKey){
+                switch (tagKey)
+                {
                     case "Test":
                         Debug.Log("Test Tag Triggered!");
                         break;
                     case "RerollEvent":
-                        if (tagValue == "true"){
+                        if (tagValue == "true")
+                        {
                             eventsManager.incrementRandomEventCounter();
                             DeactivateDialogue();
                             ActivateDialogueEvent(-1);
                         }
-                        else{
+                        else
+                        {
                             eventsManager.setRandomEventCounter(0);
                         }
                         break;
@@ -324,9 +376,6 @@ public class DialogueManager : MonoBehaviour
                         // Debug.Log("Animating Carina " + tag);
                         expressionManager.playExpression(tagValue);
                         break;
-                    case "Background":
-                        expressionManager.playBackground(tagValue);
-                    break;
                     default:
                         Debug.Log("Error, tag [" + tagKey + "] could not be identified.");
                         break;
@@ -337,16 +386,23 @@ public class DialogueManager : MonoBehaviour
 
 
     //Getter method for canInteract.
-    public bool getCanInteract(){
+    public bool getCanInteract()
+    {
         return canInteract;
     }
 
-    /*
-    //Plays a sound from the selected voice clips
-    public void playSound(AudioClip[] clips){
-        int num = random.Next(clips.Length); 
-        source.PlayOneShot (source.clip[num]);
+    
+    //Plays a sound depending on the frequency of the typed character
+    public void playDialogueSound(int charCount){
+        if (charCount % 3 == 0)
+        {
+            if (stopAudioSource)
+            {
+                audioSource.Stop();
+            }
+            audioSource.pitch = Random.Range(minPitch, maxPitch);
+            audioSource.PlayOneShot(dialogueTypingSoundClip);
+        }
     }
-    */
 
 }
